@@ -1,0 +1,1049 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+		"name": "Serverest API Tests",
+		"description": "Coleção de testes automatizados para validar os endpoints da API Serverest",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "12345678"
+	},
+	"item": [
+		{
+			"name": "Usuários",
+			"item": [
+				{
+					"name": "GET - Listar todos os usuários",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Validação de variáveis obrigatórias",
+									"if (!pm.environment.get('baseUrl')) {",
+									"    throw new Error('Variable baseUrl is not defined in environment');",
+									"}",
+									"console.log('Base URL:', pm.environment.get('baseUrl'));"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validação de Status Code",
+									"pm.test(\"Status code deve ser 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Validação de Tempo de Resposta",
+									"pm.test(\"Tempo de resposta deve ser menor que 2000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});",
+									"",
+									"// Validação de Schema",
+									"pm.test(\"Response deve ter estrutura correta\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('quantidade');",
+									"    pm.expect(jsonData).to.have.property('usuarios');",
+									"    pm.expect(jsonData.usuarios).to.be.an('array');",
+									"});",
+									"",
+									"// Validação de Contrato - Estrutura do usuário",
+									"pm.test(\"Usuários devem ter estrutura correta\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    if (jsonData.usuarios && jsonData.usuarios.length > 0) {",
+									"        const usuario = jsonData.usuarios[0];",
+									"        pm.expect(usuario).to.have.property('nome');",
+									"        pm.expect(usuario).to.have.property('email');",
+									"        pm.expect(usuario).to.have.property('password');",
+									"        pm.expect(usuario).to.have.property('administrador');",
+									"        pm.expect(usuario).to.have.property('_id');",
+									"    }",
+									"});",
+									"",
+									"// Salvar ID do primeiro usuário para uso em outros testes",
+									"const responseData = pm.response.json();",
+									"if (responseData.usuarios && responseData.usuarios.length > 0) {",
+									"    pm.environment.set(\"usuario_id\", responseData.usuarios[0]._id);",
+									"    console.log('Usuario ID salvo:', responseData.usuarios[0]._id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/usuarios",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"usuarios"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET - Buscar usuário por ID",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Validação de variáveis obrigatórias",
+									"if (!pm.environment.get('baseUrl')) {",
+									"    throw new Error('Variable baseUrl is not defined in environment');",
+									"}",
+									"if (!pm.environment.get('usuario_id')) {",
+									"    throw new Error('Variable usuario_id is not defined. Execute \"GET - Listar todos os usuários\" first');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validação de Status Code",
+									"pm.test(\"Status code deve ser 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Validação de Tempo de Resposta",
+									"pm.test(\"Tempo de resposta deve ser menor que 2000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});",
+									"",
+									"// Validação de Schema do usuário específico",
+									"pm.test(\"Usuário deve ter estrutura correta\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('nome');",
+									"    pm.expect(jsonData).to.have.property('email');",
+									"    pm.expect(jsonData).to.have.property('password');",
+									"    pm.expect(jsonData).to.have.property('administrador');",
+									"    pm.expect(jsonData).to.have.property('_id');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/usuarios/{{usuario_id}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"usuarios",
+								"{{usuario_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET - Buscar usuário inexistente",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Validação de variáveis obrigatórias",
+									"if (!pm.environment.get('baseUrl')) {",
+									"    throw new Error('Variable baseUrl is not defined in environment');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validação de Status Code para ID inexistente",
+									"pm.test(\"Status code deve ser 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"// Validação de Tempo de Resposta",
+									"pm.test(\"Tempo de resposta deve ser menor que 2000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});",
+									"",
+									"// Validação de mensagem de erro",
+									"pm.test(\"Deve retornar mensagem de usuário não encontrado\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('message');",
+									"    pm.expect(jsonData.message).to.include('Usuário não encontrado');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/usuarios/id_inexistente",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"usuarios",
+								"id_inexistente"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST - Criar usuário",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Validação de variáveis obrigatórias",
+									"if (!pm.environment.get('baseUrl')) {",
+									"    throw new Error('Variable baseUrl is not defined in environment');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validação de Status Code",
+									"pm.test(\"Status code deve ser 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"// Validação de Tempo de Resposta",
+									"pm.test(\"Tempo de resposta deve ser menor que 2000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});",
+									"",
+									"// Validação de Schema da resposta",
+									"pm.test(\"Response deve ter estrutura correta\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('message');",
+									"    pm.expect(jsonData).to.have.property('_id');",
+									"    pm.expect(jsonData.message).to.include('Cadastro realizado com sucesso');",
+									"});",
+									"",
+									"// Salvar ID do usuário criado",
+									"const responseData = pm.response.json();",
+									"if (responseData._id) {",
+									"    pm.environment.set(\"novo_usuario_id\", responseData._id);",
+									"    console.log('Novo Usuario ID salvo:', responseData._id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nome\": \"Usuário Teste Postman\",\n    \"email\": \"teste.postman.{{$timestamp}}@email.com\",\n    \"password\": \"senha123\",\n    \"administrador\": \"true\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/usuarios",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"usuarios"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST - Criar usuário com email duplicado",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Validação de variáveis obrigatórias",
+									"if (!pm.environment.get('baseUrl')) {",
+									"    throw new Error('Variable baseUrl is not defined in environment');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validação de Status Code para email duplicado",
+									"pm.test(\"Status code deve ser 400\", function () {",
+									"    pm.response.to.have.status(400);",
+									"});",
+									"",
+									"// Validação de Tempo de Resposta",
+									"pm.test(\"Tempo de resposta deve ser menor que 2000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});",
+									"",
+									"// Validação de mensagem de erro",
+									"pm.test(\"Deve retornar mensagem de email já cadastrado\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('message');",
+									"    pm.expect(jsonData.message).to.include('Este email já está sendo usado');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nome\": \"Usuário Duplicado\",\n    \"email\": \"fulano@qa.com\",\n    \"password\": \"senha123\",\n    \"administrador\": \"true\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/usuarios",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"usuarios"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Login",
+			"item": [
+				{
+					"name": "POST - Login com sucesso",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Validação de variáveis obrigatórias",
+									"if (!pm.environment.get('baseUrl')) {",
+									"    throw new Error('Variable baseUrl is not defined in environment');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validação de Status Code",
+									"pm.test(\"Status code deve ser 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Validação de Tempo de Resposta",
+									"pm.test(\"Tempo de resposta deve ser menor que 2000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});",
+									"",
+									"// Validação de Schema do token",
+									"pm.test(\"Response deve conter token de autorização\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('message');",
+									"    pm.expect(jsonData).to.have.property('authorization');",
+									"    pm.expect(jsonData.message).to.include('Login realizado com sucesso');",
+									"    pm.expect(jsonData.authorization).to.be.a('string');",
+									"    pm.expect(jsonData.authorization).to.not.be.empty;",
+									"});",
+									"",
+									"// Salvar token para uso em outros testes",
+									"const responseData = pm.response.json();",
+									"if (responseData.authorization) {",
+									"    pm.environment.set(\"auth_token\", responseData.authorization);",
+									"    console.log('Token salvo com sucesso');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"fulano@qa.com\",\n    \"password\": \"teste\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST - Login com credenciais inválidas",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Validação de variáveis obrigatórias",
+									"if (!pm.environment.get('baseUrl')) {",
+									"    throw new Error('Variable baseUrl is not defined in environment');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validação de Status Code para credenciais inválidas",
+									"pm.test(\"Status code deve ser 401\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"// Validação de Tempo de Resposta",
+									"pm.test(\"Tempo de resposta deve ser menor que 2000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});",
+									"",
+									"// Validação de mensagem de erro",
+									"pm.test(\"Deve retornar mensagem de credenciais inválidas\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('message');",
+									"    pm.expect(jsonData.message).to.include('Email e/ou senha inválidos');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"email@invalido.com\",\n    \"password\": \"senha_errada\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Produtos",
+			"item": [
+				{
+					"name": "GET - Listar todos os produtos",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Validação de variáveis obrigatórias",
+									"if (!pm.environment.get('baseUrl')) {",
+									"    throw new Error('Variable baseUrl is not defined in environment');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validação de Status Code",
+									"pm.test(\"Status code deve ser 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Validação de Tempo de Resposta",
+									"pm.test(\"Tempo de resposta deve ser menor que 2000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});",
+									"",
+									"// Validação de Schema",
+									"pm.test(\"Response deve ter estrutura correta\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('quantidade');",
+									"    pm.expect(jsonData).to.have.property('produtos');",
+									"    pm.expect(jsonData.produtos).to.be.an('array');",
+									"});",
+									"",
+									"// Validação de Contrato - Estrutura do produto",
+									"pm.test(\"Produtos devem ter estrutura correta\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    if (jsonData.produtos && jsonData.produtos.length > 0) {",
+									"        const produto = jsonData.produtos[0];",
+									"        pm.expect(produto).to.have.property('nome');",
+									"        pm.expect(produto).to.have.property('preco');",
+									"        pm.expect(produto).to.have.property('descricao');",
+									"        pm.expect(produto).to.have.property('quantidade');",
+									"        pm.expect(produto).to.have.property('_id');",
+									"    }",
+									"});",
+									"",
+									"// Salvar ID do primeiro produto para uso em outros testes",
+									"const responseData = pm.response.json();",
+									"if (responseData.produtos && responseData.produtos.length > 0) {",
+									"    pm.environment.set(\"produto_id\", responseData.produtos[0]._id);",
+									"    console.log('Produto ID salvo:', responseData.produtos[0]._id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/produtos",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"produtos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET - Buscar produto por ID",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Validação de variáveis obrigatórias",
+									"if (!pm.environment.get('baseUrl')) {",
+									"    throw new Error('Variable baseUrl is not defined in environment');",
+									"}",
+									"if (!pm.environment.get('produto_id')) {",
+									"    throw new Error('Variable produto_id is not defined. Execute \"GET - Listar todos os produtos\" first');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validação de Status Code",
+									"pm.test(\"Status code deve ser 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Validação de Tempo de Resposta",
+									"pm.test(\"Tempo de resposta deve ser menor que 2000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});",
+									"",
+									"// Validação de Schema do produto específico",
+									"pm.test(\"Produto deve ter estrutura correta\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('nome');",
+									"    pm.expect(jsonData).to.have.property('preco');",
+									"    pm.expect(jsonData).to.have.property('descricao');",
+									"    pm.expect(jsonData).to.have.property('quantidade');",
+									"    pm.expect(jsonData).to.have.property('_id');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/produtos/{{produto_id}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"produtos",
+								"{{produto_id}}"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST - Criar produto",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Validação de variáveis obrigatórias",
+									"if (!pm.environment.get('baseUrl')) {",
+									"    throw new Error('Variable baseUrl is not defined in environment');",
+									"}",
+									"if (!pm.environment.get('auth_token')) {",
+									"    throw new Error('Variable auth_token is not defined. Execute \"POST - Login com sucesso\" first');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validação de Status Code",
+									"pm.test(\"Status code deve ser 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"// Validação de Tempo de Resposta",
+									"pm.test(\"Tempo de resposta deve ser menor que 2000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});",
+									"",
+									"// Validação de Schema da resposta",
+									"pm.test(\"Response deve ter estrutura correta\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('message');",
+									"    pm.expect(jsonData).to.have.property('_id');",
+									"    pm.expect(jsonData.message).to.include('Cadastro realizado com sucesso');",
+									"});",
+									"",
+									"// Salvar ID do produto criado",
+									"const responseData = pm.response.json();",
+									"if (responseData._id) {",
+									"    pm.environment.set(\"novo_produto_id\", responseData._id);",
+									"    console.log('Novo Produto ID salvo:', responseData._id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{auth_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nome\": \"Produto Teste Postman {{$timestamp}}\",\n    \"preco\": 299,\n    \"descricao\": \"Produto criado via teste automatizado\",\n    \"quantidade\": 50\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/produtos",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"produtos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST - Criar produto sem autenticação",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Validação de variáveis obrigatórias",
+									"if (!pm.environment.get('baseUrl')) {",
+									"    throw new Error('Variable baseUrl is not defined in environment');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validação de Status Code para falta de autenticação",
+									"pm.test(\"Status code deve ser 401\", function () {",
+									"    pm.response.to.have.status(401);",
+									"});",
+									"",
+									"// Validação de Tempo de Resposta",
+									"pm.test(\"Tempo de resposta deve ser menor que 2000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});",
+									"",
+									"// Validação de mensagem de erro",
+									"pm.test(\"Deve retornar mensagem de token ausente\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('message');",
+									"    pm.expect(jsonData.message).to.include('Token de acesso ausente');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"nome\": \"Produto Sem Auth\",\n    \"preco\": 199,\n    \"descricao\": \"Produto teste sem autenticação\",\n    \"quantidade\": 10\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/produtos",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"produtos"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Carrinho",
+			"item": [
+				{
+					"name": "GET - Listar todos os carrinhos",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Validação de variáveis obrigatórias",
+									"if (!pm.environment.get('baseUrl')) {",
+									"    throw new Error('Variable baseUrl is not defined in environment');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validação de Status Code",
+									"pm.test(\"Status code deve ser 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Validação de Tempo de Resposta",
+									"pm.test(\"Tempo de resposta deve ser menor que 2000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});",
+									"",
+									"// Validação de Schema",
+									"pm.test(\"Response deve ter estrutura correta\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('quantidade');",
+									"    pm.expect(jsonData).to.have.property('carrinhos');",
+									"    pm.expect(jsonData.carrinhos).to.be.an('array');",
+									"});",
+									"",
+									"// Validação de Contrato - Estrutura do carrinho",
+									"pm.test(\"Carrinhos devem ter estrutura correta\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    if (jsonData.carrinhos && jsonData.carrinhos.length > 0) {",
+									"        const carrinho = jsonData.carrinhos[0];",
+									"        pm.expect(carrinho).to.have.property('produtos');",
+									"        pm.expect(carrinho).to.have.property('precoTotal');",
+									"        pm.expect(carrinho).to.have.property('quantidadeTotal');",
+									"        pm.expect(carrinho).to.have.property('idUsuario');",
+									"        pm.expect(carrinho).to.have.property('_id');",
+									"        pm.expect(carrinho.produtos).to.be.an('array');",
+									"    }",
+									"});",
+									"",
+									"// Salvar ID do primeiro carrinho para uso em outros testes",
+									"const responseData = pm.response.json();",
+									"if (responseData.carrinhos && responseData.carrinhos.length > 0) {",
+									"    pm.environment.set(\"carrinho_id\", responseData.carrinhos[0]._id);",
+									"    console.log('Carrinho ID salvo:', responseData.carrinhos[0]._id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/carrinhos",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"carrinhos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST - Criar carrinho",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Validação de variáveis obrigatórias",
+									"if (!pm.environment.get('baseUrl')) {",
+									"    throw new Error('Variable baseUrl is not defined in environment');",
+									"}",
+									"if (!pm.environment.get('auth_token')) {",
+									"    throw new Error('Variable auth_token is not defined. Execute \"POST - Login com sucesso\" first');",
+									"}",
+									"if (!pm.environment.get('produto_id')) {",
+									"    throw new Error('Variable produto_id is not defined. Execute \"GET - Listar todos os produtos\" first');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validação de Status Code",
+									"pm.test(\"Status code deve ser 201\", function () {",
+									"    pm.response.to.have.status(201);",
+									"});",
+									"",
+									"// Validação de Tempo de Resposta",
+									"pm.test(\"Tempo de resposta deve ser menor que 2000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});",
+									"",
+									"// Validação de Schema da resposta",
+									"pm.test(\"Response deve ter estrutura correta\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('message');",
+									"    pm.expect(jsonData).to.have.property('_id');",
+									"    pm.expect(jsonData.message).to.include('Cadastro realizado com sucesso');",
+									"});",
+									"",
+									"// Salvar ID do carrinho criado",
+									"const responseData = pm.response.json();",
+									"if (responseData._id) {",
+									"    pm.environment.set(\"novo_carrinho_id\", responseData._id);",
+									"    console.log('Novo Carrinho ID salvo:', responseData._id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "Authorization",
+								"value": "{{auth_token}}"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"produtos\": [\n        {\n            \"idProduto\": \"{{produto_id}}\",\n            \"quantidade\": 2\n        }\n    ]\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/carrinhos",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"carrinhos"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE - Cancelar compra",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Validação de variáveis obrigatórias",
+									"if (!pm.environment.get('baseUrl')) {",
+									"    throw new Error('Variable baseUrl is not defined in environment');",
+									"}",
+									"if (!pm.environment.get('auth_token')) {",
+									"    throw new Error('Variable auth_token is not defined. Execute \"POST - Login com sucesso\" first');",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Validação de Status Code",
+									"pm.test(\"Status code deve ser 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"// Validação de Tempo de Resposta",
+									"pm.test(\"Tempo de resposta deve ser menor que 2000ms\", function () {",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);",
+									"});",
+									"",
+									"// Validação de mensagem de sucesso",
+									"pm.test(\"Deve retornar mensagem de cancelamento\", function () {",
+									"    const jsonData = pm.response.json();",
+									"    pm.expect(jsonData).to.have.property('message');",
+									"    pm.expect(jsonData.message).to.include('Registro excluído com sucesso');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "{{auth_token}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/carrinhos/cancelar-compra",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"carrinhos",
+								"cancelar-compra"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Validação global de variáveis",
+					"console.log('=== VALIDAÇÃO DE AMBIENTE ===');",
+					"console.log('Base URL:', pm.environment.get('baseUrl'));",
+					"console.log('Environment Name:', pm.environment.name);",
+					"",
+					"// Verificar se o ambiente está selecionado",
+					"if (!pm.environment.name) {",
+					"    console.error('ERRO: Nenhum ambiente selecionado! Selecione \"Serverest - Ambiente\"');",
+					"}",
+					"",
+					"// Verificar se baseUrl está definida",
+					"if (!pm.environment.get('baseUrl')) {",
+					"    console.error('ERRO: Variable baseUrl não está definida no ambiente!');",
+					"    console.log('Definindo baseUrl padrão...');",
+					"    pm.environment.set('baseUrl', 'https://serverest.dev');",
+					"}"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Logs globais pós-execução",
+					"console.log('=== RESULTADO DA REQUISIÇÃO ===');",
+					"console.log('Status:', pm.response.status);",
+					"console.log('Tempo:', pm.response.responseTime + 'ms');",
+					"console.log('Tamanho:', pm.response.responseSize + ' bytes');"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "collection_id",
+			"value": "a1b2c3d4-e5f6-7890-abcd-ef1234567890"
+		}
+	]
+}

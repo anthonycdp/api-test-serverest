@@ -1,0 +1,79 @@
+name: Postman Collection Validation
+
+on:
+  # Executa em push para a branch main
+  push:
+    branches: [ main ]
+  # Executa em pull requests para a branch main
+  pull_request:
+    branches: [ main ]
+  # Permite execução manual
+  workflow_dispatch:
+
+jobs:
+  validate-collection:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout código
+      uses: actions/checkout@v4
+    
+    - name: Validate JSON Files
+      run: |
+        echo "## 🧪 Postman Collection Validation" >> $GITHUB_STEP_SUMMARY
+        echo "Validando arquivos JSON da coleção e ambiente..." >> $GITHUB_STEP_SUMMARY
+        
+        # Validar sintaxe JSON da coleção
+        if jq empty "Serverest_API_Tests.postman_collection.json" 2>/dev/null; then
+          echo "✅ Collection JSON is valid" >> $GITHUB_STEP_SUMMARY
+          collection_valid=true
+        else
+          echo "❌ Collection JSON is invalid" >> $GITHUB_STEP_SUMMARY
+          collection_valid=false
+        fi
+        
+        # Validar sintaxe JSON do ambiente
+        if jq empty "Serverest_Environment.postman_environment.json" 2>/dev/null; then
+          echo "✅ Environment JSON is valid" >> $GITHUB_STEP_SUMMARY
+          environment_valid=true
+        else
+          echo "❌ Environment JSON is invalid" >> $GITHUB_STEP_SUMMARY
+          environment_valid=false
+        fi
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 📊 Validation Summary" >> $GITHUB_STEP_SUMMARY
+        echo "- **Collection:** Serverest API Tests" >> $GITHUB_STEP_SUMMARY
+        echo "- **Environment:** Serverest - Ambiente" >> $GITHUB_STEP_SUMMARY
+        echo "- **Validation Time:** $(date)" >> $GITHUB_STEP_SUMMARY
+        
+        # Verificar se ambos os arquivos são válidos
+        if [ "$collection_valid" = true ] && [ "$environment_valid" = true ]; then
+          echo "- **Status:** ✅ All files valid" >> $GITHUB_STEP_SUMMARY
+          exit 0
+        else
+          echo "- **Status:** ❌ Validation failed" >> $GITHUB_STEP_SUMMARY
+          exit 1
+        fi
+    
+    - name: Check Collection Structure
+      run: |
+        echo "### 🔍 Collection Analysis" >> $GITHUB_STEP_SUMMARY
+        
+        # Contar total de requests
+        request_count=$(jq '[.item[].item[]? // .item[]] | length' "Serverest_API_Tests.postman_collection.json")
+        echo "- **Total Requests:** $request_count" >> $GITHUB_STEP_SUMMARY
+        
+        # Verificar se existe baseUrl no ambiente
+        if jq -e '.values[] | select(.key == "baseUrl")' "Serverest_Environment.postman_environment.json" > /dev/null; then
+          echo "- **BaseUrl Variable:** ✅ Configured" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "- **BaseUrl Variable:** ❌ Missing" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        # Verificar se existe validação global
+        if jq -e '.event[]? | select(.listen == "prerequest")' "Serverest_API_Tests.postman_collection.json" > /dev/null; then
+          echo "- **Global Pre-request Scripts:** ✅ Present" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "- **Global Pre-request Scripts:** ❌ Missing" >> $GITHUB_STEP_SUMMARY
+        fi

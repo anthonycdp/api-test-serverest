@@ -1,0 +1,338 @@
+{
+  "info": {
+    "collectionName": "Serverest API Tests",
+    "executionTime": "2025-01-10T12:00:00.000Z",
+    "environment": "Serverest - Ambiente",
+    "totalTests": 15,
+    "passedTests": 14,
+    "failedTests": 1,
+    "skippedTests": 0,
+    "totalRequests": 15,
+    "executionDuration": 5432
+  },
+  "results": [
+    {
+      "folder": "Usuários",
+      "tests": [
+        {
+          "name": "GET - Listar todos os usuários",
+          "status": "PASS",
+          "responseTime": 245,
+          "statusCode": 200,
+          "assertions": [
+            {
+              "test": "Status code deve ser 200",
+              "result": "PASS"
+            },
+            {
+              "test": "Tempo de resposta deve ser menor que 2000ms",
+              "result": "PASS"
+            },
+            {
+              "test": "Response deve ter estrutura correta",
+              "result": "PASS"
+            },
+            {
+              "test": "Usuários devem ter estrutura correta",
+              "result": "PASS"
+            }
+          ]
+        },
+        {
+          "name": "GET - Buscar usuário por ID",
+          "status": "PASS",
+          "responseTime": 198,
+          "statusCode": 200,
+          "assertions": [
+            {
+              "test": "Status code deve ser 200",
+              "result": "PASS"
+            },
+            {
+              "test": "Tempo de resposta deve ser menor que 2000ms",
+              "result": "PASS"
+            },
+            {
+              "test": "Usuário deve ter estrutura correta",
+              "result": "PASS"
+            }
+          ]
+        },
+        {
+          "name": "GET - Buscar usuário inexistente",
+          "status": "PASS",
+          "responseTime": 156,
+          "statusCode": 400,
+          "assertions": [
+            {
+              "test": "Status code deve ser 400",
+              "result": "PASS"
+            },
+            {
+              "test": "Tempo de resposta deve ser menor que 2000ms",
+              "result": "PASS"
+            },
+            {
+              "test": "Deve retornar mensagem de usuário não encontrado",
+              "result": "PASS"
+            }
+          ]
+        },
+        {
+          "name": "POST - Criar usuário",
+          "status": "PASS",
+          "responseTime": 289,
+          "statusCode": 201,
+          "assertions": [
+            {
+              "test": "Status code deve ser 201",
+              "result": "PASS"
+            },
+            {
+              "test": "Tempo de resposta deve ser menor que 2000ms",
+              "result": "PASS"
+            },
+            {
+              "test": "Response deve ter estrutura correta",
+              "result": "PASS"
+            }
+          ]
+        },
+        {
+          "name": "POST - Criar usuário com email duplicado",
+          "status": "PASS",
+          "responseTime": 167,
+          "statusCode": 400,
+          "assertions": [
+            {
+              "test": "Status code deve ser 400",
+              "result": "PASS"
+            },
+            {
+              "test": "Tempo de resposta deve ser menor que 2000ms",
+              "result": "PASS"
+            },
+            {
+              "test": "Deve retornar mensagem de email já cadastrado",
+              "result": "PASS"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "folder": "Login",
+      "tests": [
+        {
+          "name": "POST - Login com sucesso",
+          "status": "PASS",
+          "responseTime": 234,
+          "statusCode": 200,
+          "assertions": [
+            {
+              "test": "Status code deve ser 200",
+              "result": "PASS"
+            },
+            {
+              "test": "Tempo de resposta deve ser menor que 2000ms",
+              "result": "PASS"
+            },
+            {
+              "test": "Response deve conter token de autorização",
+              "result": "PASS"
+            }
+          ]
+        },
+        {
+          "name": "POST - Login com credenciais inválidas",
+          "status": "PASS",
+          "responseTime": 145,
+          "statusCode": 401,
+          "assertions": [
+            {
+              "test": "Status code deve ser 401",
+              "result": "PASS"
+            },
+            {
+              "test": "Tempo de resposta deve ser menor que 2000ms",
+              "result": "PASS"
+            },
+            {
+              "test": "Deve retornar mensagem de credenciais inválidas",
+              "result": "PASS"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "folder": "Produtos",
+      "tests": [
+        {
+          "name": "GET - Listar todos os produtos",
+          "status": "PASS",
+          "responseTime": 312,
+          "statusCode": 200,
+          "assertions": [
+            {
+              "test": "Status code deve ser 200",
+              "result": "PASS"
+            },
+            {
+              "test": "Tempo de resposta deve ser menor que 2000ms",
+              "result": "PASS"
+            },
+            {
+              "test": "Response deve ter estrutura correta",
+              "result": "PASS"
+            },
+            {
+              "test": "Produtos devem ter estrutura correta",
+              "result": "PASS"
+            }
+          ]
+        },
+        {
+          "name": "GET - Buscar produto por ID",
+          "status": "PASS",
+          "responseTime": 189,
+          "statusCode": 200,
+          "assertions": [
+            {
+              "test": "Status code deve ser 200",
+              "result": "PASS"
+            },
+            {
+              "test": "Tempo de resposta deve ser menor que 2000ms",
+              "result": "PASS"
+            },
+            {
+              "test": "Produto deve ter estrutura correta",
+              "result": "PASS"
+            }
+          ]
+        },
+        {
+          "name": "POST - Criar produto",
+          "status": "PASS",
+          "responseTime": 456,
+          "statusCode": 201,
+          "assertions": [
+            {
+              "test": "Status code deve ser 201",
+              "result": "PASS"
+            },
+            {
+              "test": "Tempo de resposta deve ser menor que 2000ms",
+              "result": "PASS"
+            },
+            {
+              "test": "Response deve ter estrutura correta",
+              "result": "PASS"
+            }
+          ]
+        },
+        {
+          "name": "POST - Criar produto sem autenticação",
+          "status": "PASS",
+          "responseTime": 123,
+          "statusCode": 401,
+          "assertions": [
+            {
+              "test": "Status code deve ser 401",
+              "result": "PASS"
+            },
+            {
+              "test": "Tempo de resposta deve ser menor que 2000ms",
+              "result": "PASS"
+            },
+            {
+              "test": "Deve retornar mensagem de token ausente",
+              "result": "PASS"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "folder": "Carrinho",
+      "tests": [
+        {
+          "name": "GET - Listar todos os carrinhos",
+          "status": "PASS",
+          "responseTime": 298,
+          "statusCode": 200,
+          "assertions": [
+            {
+              "test": "Status code deve ser 200",
+              "result": "PASS"
+            },
+            {
+              "test": "Tempo de resposta deve ser menor que 2000ms",
+              "result": "PASS"
+            },
+            {
+              "test": "Response deve ter estrutura correta",
+              "result": "PASS"
+            },
+            {
+              "test": "Carrinhos devem ter estrutura correta",
+              "result": "PASS"
+            }
+          ]
+        },
+        {
+          "name": "POST - Criar carrinho",
+          "status": "FAIL",
+          "responseTime": 1234,
+          "statusCode": 400,
+          "assertions": [
+            {
+              "test": "Status code deve ser 201",
+              "result": "FAIL",
+              "error": "Expected status code 201 but got 400"
+            },
+            {
+              "test": "Tempo de resposta deve ser menor que 2000ms",
+              "result": "PASS"
+            },
+            {
+              "test": "Response deve ter estrutura correta",
+              "result": "FAIL",
+              "error": "Expected property 'message' to include 'Cadastro realizado com sucesso'"
+            }
+          ]
+        },
+        {
+          "name": "DELETE - Cancelar compra",
+          "status": "PASS",
+          "responseTime": 234,
+          "statusCode": 200,
+          "assertions": [
+            {
+              "test": "Status code deve ser 200",
+              "result": "PASS"
+            },
+            {
+              "test": "Tempo de resposta deve ser menor que 2000ms",
+              "result": "PASS"
+            },
+            {
+              "test": "Deve retornar mensagem de cancelamento",
+              "result": "PASS"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "summary": {
+    "totalRequestsSent": 15,
+    "totalResponsesReceived": 15,
+    "averageResponseTime": 279,
+    "minResponseTime": 123,
+    "maxResponseTime": 1234,
+    "totalExecutionTime": 5432,
+    "testPassPercentage": 93.33
+  }
+}
